@@ -22,12 +22,24 @@
       .mt-4 {
         margin-top: 20px;
       }
+      h6 {
+        color: white;
+        outline: none;
+        text-indent: -9999px;
+        white-space: nowrap;
+      }
+      a {
+        color: black;
+        font-size: 50px;
+      }
     </style>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <a class="navbar-brand" href="/">NotesKeeper</a>
     </nav>
+
+    <h6 id="section2">Section 2</h6>
 
     <div class="container my-4 text-center">
       <br />
@@ -50,7 +62,8 @@
       </div>
       <hr />
       <h1>Your Notes</h1>
-      <hr />
+      <a href="#section1">&#8595;</a>
+
       <div class="mt-4 d-none" id="editView">
         <textarea
           class="form-control text-center"
@@ -66,17 +79,18 @@
       </div>
       <div id="notes" class="row container-fluid"></div>
       <br />
-      <div class="d-block" id="notesView">
-        <div id="notes"></div>
-      </div>
+
+      <a href="#section2">&#8593;</a>
+      <hr />
+      <h6 id="section1">Section 1</h6>
     </div>
 
     <footer
       class="page-footer font-small bg-dark special-color-dark fluid-bottom pt-8"
+      id="bot"
     >
       <div class="footer-copyright text-center text-light py-3">
         © 2022 Copyright:NotesKeeper
-        <a href="/"> &#8679;</a>
       </div>
     </footer>
 
