@@ -1,41 +1,52 @@
-console.log("Welcome to notes app. This is app.js");
-showNotes();
+let addNotes = document.getElementById("addNotes");
+let editNotes = document.getElementById("editNotes");
+let cancelNotes = document.getElementById("cancelNotes");
+let localKey = "NOTES_KEY_NUMBER";
+let editIndex = null;
 
-let addBtn = document.getElementById("addBtn");
-addBtn.addEventListener("click", function (e) {
-  let addTxt = document.getElementById("addTxt");
-  let notes = localStorage.getItem("notes");
-  if (notes == null) {
-    notesObj = [];
-  } else {
-    notesObj = JSON.parse(notes);
-  }
-  notesObj.push(addTxt.value);
-  localStorage.setItem("notes", JSON.stringify(notesObj));
-  addTxt.value = "";
+showNotes();
+addNotes.addEventListener("click", addNote);
+editNotes.addEventListener("click", editNote);
+cancelNotes.addEventListener("click", reset);
+
+function addNote() {
+  let inputValue = document.getElementById("inputValue").value;
+  if (!inputValue?.trim()?.length) return;
+  let arrayOfNotes = localGetItem(localKey) || [];
+  arrayOfNotes.push(inputValue);
+  localSetItem(localKey, arrayOfNotes);
+  document.getElementById("inputValue").value = "";
   showNotes();
-});
+}
+
+function editNote() {
+  let inputEditValue = document.getElementById("inputEditValue");
+  if (!(editIndex !== null && inputEditValue.value?.trim()?.length)) return;
+  let arrayOfNotes = localGetItem(localKey);
+  arrayOfNotes[editIndex] = inputEditValue.value;
+  localSetItem(localKey, arrayOfNotes);
+  editIndex = null;
+  reset();
+}
 
 function showNotes() {
-  let notes = localStorage.getItem("notes");
-  if (notes == null) {
-    notesObj = [];
-  } else {
-    notesObj = JSON.parse(notes);
-  }
+  let arrayOfNotes = localGetItem(localKey) || [];
   let html = "";
-  notesObj.forEach(function (element, index) {
-    html += `
+
+  arrayOfNotes?.length &&
+    arrayOfNotes?.forEach(function (element, index) {
+      html += `
             <div class="noteCard my-2 mx-3 col-12 card" style="width: 20rem;">
                     <div class="card-body bg-light">
-                        <h5 class="card-title">Note ${index + 1}</h5>
+                        <h4 class="card-title">Note ${index + 1}</h4>
                         <p class="card-text"> ${element}</p>
-                        <button id="${index}"onclick="deleteNote(this.id)" class="btn btn-primary btn-dark">Delete Note</button>
+                        <button id="${index}"onclick="editButton(this.id)" class="btn btn-primary btn-dark">Edit</button>
+                        <button id="${index}"onclick="deleteNote(this.id)" class="btn btn-primary btn-dark">Delete</button>
                     </div>
                 </div>`;
-  });
+    });
   let notesElm = document.getElementById("notes");
-  if (notesObj.length != 0) {
+  if (arrayOfNotes?.length != 0) {
     notesElm.innerHTML = html;
   } else {
     notesElm.innerHTML = `Add a Note.`;
@@ -43,35 +54,33 @@ function showNotes() {
 }
 
 function deleteNote(index) {
-  let notes = localStorage.getItem("notes");
-  if (notes == null) {
-    notesObj = [];
-  } else {
-    notesObj = JSON.parse(notes);
-  }
+  let arrayOfNotes = localGetItem(localKey);
+  arrayOfNotes.splice(index, 1);
+  localSetItem(localKey, arrayOfNotes);
+  editIndex = null;
+  reset();
+}
 
-  notesObj.splice(index, 1);
-  localStorage.setItem("notes", JSON.stringify(notesObj));
+function editButton(index) {
+  let arrayOfNotes = localGetItem(localKey);
+  let value = arrayOfNotes[index];
+  document.getElementById("inputEditValue").value = value;
+  document.getElementById("notesView").className = "d-none";
+  document.getElementById("editView").className = "mt-4 d-block";
+  editIndex = index;
+}
+
+function reset() {
+  document.getElementById("notesView").className = "d-block";
+  document.getElementById("editView").className = "mt-4 d-none";
+  editIndex = null;
   showNotes();
 }
 
-let search = document.getElementById("searchTxt");
-search.addEventListener("input", function () {
-  let inputVal = search.value.toLowerCase();
-  let noteCards = document.getElementsByClassName("noteCard");
-  Array.from(noteCards).forEach(function (element) {
-    let cardTxt = element.getElementsByTagName("p")[0].innerText;
-    if (cardTxt.includes(inputVal)) {
-      element.style.display = "block";
-    } else {
-      element.style.display = "none";
-    }
-  });
-});
+function localSetItem(key, item) {
+  localStorage.setItem(key, JSON.stringify(item));
+}
 
-/*
-Further Features:
-1. Add Title
-2. Mark a note as Important
-3. Separate notes by user
-*/
+function localGetItem(key) {
+  return JSON.parse(localStorage.getItem(key));
+}
